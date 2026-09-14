@@ -1,0 +1,171 @@
+{
+	"info": {
+		"_postman_id": "956277f0-7411-48e1-9572-259ff212d68d",
+		"name": "praktikum-ppb-1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36163564"
+	},
+	"item": [
+		{
+			"name": "get all medicaiton",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "post medication",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"sku\": \"MED-001\",\r\n  \"name\": \"Paracetamol\",\r\n  \"description\": \"Obat untuk menurunkan demam\",\r\n  \"category_id\": \"f95798f1-4e04-4668-a555-a752c0a5c0ae\",\r\n  \"supplier_id\": \"<supplier_id>\",\r\n  \"price\": 12000,\r\n  \"quantity\": 100\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/medications",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"medications"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create categories",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Obat ngantuqqq 1 \"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://create-api-medication-if5f.vercel.app/api/categories",
+					"protocol": "https",
+					"host": [
+						"create-api-medication-if5f",
+						"vercel",
+						"app"
+					],
+					"path": [
+						"api",
+						"categories"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create supplier",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"sku\": \"MED-001\",\r\n  \"name\": \"Paracetamol\",\r\n  \"description\": \"Obat penurun panas dan pereda nyeri\",\r\n  \"category_id\": \"uuid-category\",\r\n  \"supplier_id\": \"uuid-supplier\",\r\n  \"price\": 15000,\r\n  \"quantity\": 100\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all categories",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "get all suppliers",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "get suppliers by id",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "update supplier",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "get id categories",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/categories/c72a19ae-d988-422a-bbc4-0bf919e94baf",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"categories",
+						"c72a19ae-d988-422a-bbc4-0bf919e94baf"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update categories",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "delete categories",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "post image",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
