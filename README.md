@@ -8,7 +8,7 @@ REST API untuk mencatat peminjaman buku oleh anggota perpustakaan. Proyek memaka
 - **Base URL Vercel:** [https://ppb-modul1-sales-6o4k.vercel.app](https://ppb-modul1-sales-6o4k.vercel.app)
 - **Base URL lokal:** `http://localhost:3000`
 
-**Status verifikasi 10 Oktober 2026:** kode telah dipush dan build produksi Vercel berhasil. `/` dan `/health` merespons HTTP 200. `/health/ready` dan `/loans?status=Terlambat` masih merespons HTTP 503 karena environment variables Supabase belum tersedia di Vercel. Alamat Supabase pada konfigurasi lokal sebelumnya juga tidak dapat ditemukan melalui DNS. Agar seluruh ketentuan pengumpulan terpenuhi, pasang schema di project Supabase aktif, isi `SUPABASE_URL` dan `SUPABASE_SERVICE_ROLE_KEY` di Vercel, redeploy, lalu jalankan smoke test sampai lulus.
+**Status verifikasi 10 Oktober 2026:** kode telah dipush dan build produksi Vercel berhasil. `/` dan `/health` merespons HTTP 200. `/health/ready` dan `/loans?status=Terlambat` masih merespons HTTP 503 karena environment variables Supabase belum tersedia di Vercel. Project Supabase lokal sekarang dapat dijangkau dan anon key diterima, tetapi tabel `members`, `books`, `loans`, dan view `loan_details` belum ditemukan. Agar seluruh ketentuan pengumpulan terpenuhi, pasang schema, konfigurasi akses database sesuai pilihan key di bawah, tambahkan environment variables di Vercel, redeploy, lalu jalankan smoke test sampai lulus.
 
 ## Fitur dan endpoint
 
@@ -108,7 +108,16 @@ Field `status` hanya muncul di response dan tidak dikirim dalam body. Ubah `retu
    PORT=3000
    ```
 
-   Ambil URL dan secret key / legacy `service_role` key dari **Project Settings → API Keys**. Kunci ini hanya dipakai backend. Schema mengaktifkan RLS dan membatasi akses database langsung kepada `service_role`; **anon/publishable key tidak dapat menjalankan CRUD**. Variabel lama `SUPABASE_KEY` didukung sebagai alternatif apabila nilainya adalah kunci server.
+   Ambil URL dasar proyek dan secret key / legacy `service_role` key dari **Project Settings → API Keys**. Kunci server hanya dipakai backend. Schema utama mengaktifkan RLS dan membatasi akses database langsung kepada `service_role`. URL untuk Supabase SDK adalah `https://PROJECT_REF.supabase.co`, tanpa `/rest/v1/`.
+
+   **Alternatif untuk anon key pada demo tugas publik:** setelah `schema.sql`, jalankan juga [`supabase/anon-demo.sql`](supabase/anon-demo.sql). Isi konfigurasi berikut di `.env` lokal dan Vercel:
+
+   ```dotenv
+   SUPABASE_URL=https://PROJECT_REF.supabase.co
+   SUPABASE_KEY=ISI_ANON_KEY
+   ```
+
+   Kosongkan atau hapus `SUPABASE_SERVICE_ROLE_KEY` saat memilih opsi anon karena aplikasi memprioritaskan variabel tersebut. Kebijakan demo memberi role `anon` akses CRUD langsung hanya ke tabel perpustakaan dan akses baca view; gunakan data fiktif. Key `anon` tidak mempunyai hak membuat tabel atau menjalankan SQL schema. Variabel `SUPABASE_KEY` juga mendukung legacy service-role key.
 
 6. Jalankan:
 
@@ -291,7 +300,7 @@ Aplikasi mengekspor instance Express dari `src/index.js`; listener lokal berada 
 2. Commit dan push kode ke repository publik di atas.
 3. Untuk deployment yang sudah terhubung, buka project Vercel **`ppb-modul1-sales-6o4k`**. Untuk membuat deployment baru, masuk ke Vercel → **Add New → Project**, lalu import repository `kaylrad/PPB_modul1_sales`.
 4. Pilih framework **Express**, root directory `./`, Node.js **22.x**. Biarkan Build Command dan Output Directory mengikuti default Express.
-5. Tambahkan environment variables `SUPABASE_URL` dan `SUPABASE_SERVICE_ROLE_KEY` untuk **Production** (serta Preview bila dibutuhkan). Jangan unggah `.env` atau token pengelolaan akun ke repository.
+5. Tambahkan environment variables `SUPABASE_URL` dan `SUPABASE_SERVICE_ROLE_KEY` untuk **Production** (serta Preview bila dibutuhkan). Jika memakai mode anon, jalankan `anon-demo.sql`, gunakan `SUPABASE_KEY` sebagai pengganti `SUPABASE_SERVICE_ROLE_KEY`, dan kosongkan/hapus variabel service-role. Jangan unggah `.env` atau token pengelolaan akun ke repository.
 6. Klik **Deploy**. Jika mengubah environment variables setelah deploy, lakukan redeploy.
 7. Di project Vercel, pastikan deployment produksi dapat diakses publik. Jika Deployment Protection meminta login, sesuaikan pengaturan produksi agar penilai dapat mengakses endpoint.
 8. Salin domain produksi yang diberikan Vercel. Uji `/health/ready`, `/loans`, dan `/loans?status=Terlambat`, kemudian jalankan smoke test terhadap domain tersebut.
@@ -306,6 +315,8 @@ npx vercel env add SUPABASE_URL production
 npx vercel env add SUPABASE_SERVICE_ROLE_KEY production
 npx vercel --prod
 ```
+
+Untuk mode anon, ganti perintah `vercel env add SUPABASE_SERVICE_ROLE_KEY production` dengan `vercel env add SUPABASE_KEY production`.
 
 Rujukan: [Express on Vercel](https://vercel.com/docs/frameworks/backend/express), [Supabase views](https://supabase.com/docs/guides/database/views), dan [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security).
 
@@ -322,6 +333,7 @@ src/
   utils/validation.js       # Validasi body, query, UUID, tanggal
 supabase/
   schema.sql                # Tabel, relasi, view status, izin, indeks
+  anon-demo.sql             # Opsi kebijakan RLS untuk anon key demo publik
   seed.sql                  # Data fiktif opsional
 scripts/smoke.mjs            # Uji terhadap API dan database nyata
 test/                       # Test otomatis

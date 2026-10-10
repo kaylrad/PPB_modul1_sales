@@ -217,3 +217,24 @@ test('schema dapat dijalankan ulang, seed valid, RLS aktif, dan anon tidak mempe
   assert.equal(permissions.anon_read, false);
   assert.equal(permissions.server_write, true);
 });
+
+test('mode anon opsional membuka CRUD demo melalui RLS tanpa membuka akses authenticated', async () => {
+  const sql = await readFile(new URL('../supabase/anon-demo.sql', import.meta.url), 'utf8');
+  await db.exec(sql);
+  await db.exec(sql);
+  const permissions = (await db.query("SELECT has_table_privilege('anon', 'public.loan_details', 'SELECT') AS anon_read, has_table_privilege('authenticated', 'public.loans', 'INSERT') AS authenticated_write")).rows[0];
+  assert.equal(permissions.anon_read, true);
+  assert.equal(permissions.authenticated_write, false);
+  await db.exec('SET ROLE anon;');
+  try {
+    const anonMember = (await db.query("INSERT INTO public.members (member_code, name) VALUES ('ANON-TEST', 'Anggota Anon') RETURNING id")).rows[0];
+    const anonLoan = (await db.query('INSERT INTO public.loans (member_id, book_id, borrowed_at, due_at) VALUES ($1, $2, $3, $3) RETURNING id', [anonMember.id, book.id, yesterday])).rows[0];
+    assert.equal((await db.query('SELECT status FROM public.loan_details WHERE id = $1', [anonLoan.id])).rows[0].status, 'Terlambat');
+    await db.query('UPDATE public.loans SET returned_at = $1 WHERE id = $2', [today, anonLoan.id]);
+    assert.equal((await db.query('SELECT status FROM public.loan_details WHERE id = $1', [anonLoan.id])).rows[0].status, 'Dikembalikan');
+    await db.query('DELETE FROM public.loans WHERE id = $1', [anonLoan.id]);
+    await db.query('DELETE FROM public.members WHERE id = $1', [anonMember.id]);
+  } finally {
+    await db.exec('RESET ROLE;');
+  }
+});
