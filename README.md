@@ -5,8 +5,10 @@ REST API untuk mencatat peminjaman buku oleh anggota perpustakaan. Proyek memaka
 ## Link pengumpulan
 
 - **Repository publik:** https://github.com/kaylrad/PPB_modul1_sales
-- **Base URL Vercel:** **Belum tersedia — deployment menunggu konfigurasi Supabase aktif dan akses Vercel.** Isi dengan URL produksi yang benar setelah deployment berhasil; jangan menggunakan URL contoh sebagai hasil pengumpulan.
+- **Base URL Vercel:** [https://ppb-modul1-sales-6o4k.vercel.app](https://ppb-modul1-sales-6o4k.vercel.app)
 - **Base URL lokal:** `http://localhost:3000`
+
+**Status verifikasi 10 Oktober 2026:** kode telah dipush dan build produksi Vercel berhasil. `/` dan `/health` merespons HTTP 200. `/health/ready` dan `/loans?status=Terlambat` masih merespons HTTP 503 karena environment variables Supabase belum tersedia di Vercel. Alamat Supabase pada konfigurasi lokal sebelumnya juga tidak dapat ditemukan melalui DNS. Agar seluruh ketentuan pengumpulan terpenuhi, pasang schema di project Supabase aktif, isi `SUPABASE_URL` dan `SUPABASE_SERVICE_ROLE_KEY` di Vercel, redeploy, lalu jalankan smoke test sampai lulus.
 
 ## Fitur dan endpoint
 
@@ -274,7 +276,7 @@ Test otomatis menjalankan schema SQL asli di PostgreSQL dalam memori melalui PGl
 ```bash
 npm run smoke
 # Setelah deployment:
-npm run smoke -- https://BASE_URL_PRODUKSI.vercel.app
+npm run smoke -- https://ppb-modul1-sales-6o4k.vercel.app
 ```
 
 Smoke test membuat data uji sementara, mengecek koneksi, create/read/update/delete dan filter `Terlambat`, lalu menghapus data uji yang dibuatnya. Ia hanya menghapus ID milik pengujian tersebut.
@@ -287,13 +289,13 @@ Aplikasi mengekspor instance Express dari `src/index.js`; listener lokal berada 
 
 1. Pastikan schema sudah dipasang di Supabase aktif dan smoke test lokal lulus.
 2. Commit dan push kode ke repository publik di atas.
-3. Masuk ke Vercel → **Add New → Project**, lalu import repository `kaylrad/PPB_modul1_sales`.
+3. Untuk deployment yang sudah terhubung, buka project Vercel **`ppb-modul1-sales-6o4k`**. Untuk membuat deployment baru, masuk ke Vercel → **Add New → Project**, lalu import repository `kaylrad/PPB_modul1_sales`.
 4. Pilih framework **Express**, root directory `./`, Node.js **22.x**. Biarkan Build Command dan Output Directory mengikuti default Express.
 5. Tambahkan environment variables `SUPABASE_URL` dan `SUPABASE_SERVICE_ROLE_KEY` untuk **Production** (serta Preview bila dibutuhkan). Jangan unggah `.env` atau token pengelolaan akun ke repository.
 6. Klik **Deploy**. Jika mengubah environment variables setelah deploy, lakukan redeploy.
 7. Di project Vercel, pastikan deployment produksi dapat diakses publik. Jika Deployment Protection meminta login, sesuaikan pengaturan produksi agar penilai dapat mengakses endpoint.
 8. Salin domain produksi yang diberikan Vercel. Uji `/health/ready`, `/loans`, dan `/loans?status=Terlambat`, kemudian jalankan smoke test terhadap domain tersebut.
-9. Ganti keterangan **Base URL Vercel** di bagian Link pengumpulan dengan URL yang sudah terbukti berfungsi, lalu commit dan push README.
+9. Perbarui status verifikasi di bagian Link pengumpulan setelah seluruh endpoint berfungsi. Jika domain produksi berubah, perbarui juga **Base URL Vercel**, lalu commit dan push README.
 
 Alternatif CLI dari root proyek:
 
