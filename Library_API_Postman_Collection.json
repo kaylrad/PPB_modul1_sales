@@ -1,0 +1,336 @@
+{
+  "info": {
+    "name": "Library Loans API",
+    "description": "CRUD peminjaman buku. Jalankan berurutan agar UUID disimpan otomatis. Semua data demonstrasi dibuat dan dihapus oleh collection.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "member_id",
+      "value": ""
+    },
+    {
+      "key": "book_id",
+      "value": ""
+    },
+    {
+      "key": "loan_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 Informasi API",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 Database siap",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/health/ready"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Tambah anggota",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/members",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"member_code\": \"POSTMAN-{{$timestamp}}\",\n  \"name\": \"Anggota Postman\",\n  \"email\": \"postman@example.test\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+              "if (pm.response.code === 201) pm.collectionVariables.set('member_id', pm.response.json().data.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Tambah buku",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/books",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Buku Postman\",\n  \"author\": \"Penulis Demo\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+              "if (pm.response.code === 201) pm.collectionVariables.set('book_id', pm.response.json().data.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Buat peminjaman terlambat",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/loans",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"member_id\": \"{{member_id}}\",\n  \"book_id\": \"{{book_id}}\",\n  \"borrowed_at\": \"2000-01-01\",\n  \"due_at\": \"2000-01-02\",\n  \"notes\": \"Pengujian Postman\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+              "if (pm.response.code === 201) pm.collectionVariables.set('loan_id', pm.response.json().data.id);",
+              "pm.test('Status Terlambat', function () { pm.expect(pm.response.json().data.status).to.eql('Terlambat'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Filter Terlambat",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/loans?status=Terlambat&member_id={{member_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Peminjaman ditemukan', function () { pm.expect(pm.response.json().data.some(row => row.id === pm.collectionVariables.get('loan_id'))).to.eql(true); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 Detail peminjaman",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/loans/{{loan_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 Catat pengembalian",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/loans/{{loan_id}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"returned_at\": \"2000-01-03\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Status Dikembalikan', function () { pm.expect(pm.response.json().data.status).to.eql('Dikembalikan'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 Filter Dikembalikan",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/loans?status=Dikembalikan&member_id={{member_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 Hapus peminjaman",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{base_url}}/loans/{{loan_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 Detail setelah hapus",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/loans/{{loan_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404', function () { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 Hapus buku uji",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{base_url}}/books/{{book_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 Hapus anggota uji",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{base_url}}/members/{{member_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
