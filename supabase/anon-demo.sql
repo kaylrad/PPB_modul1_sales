@@ -1,6 +1,5 @@
--- Opsional: jalankan SETELAH schema.sql jika memakai SUPABASE_KEY berjenis anon.
--- Mode tugas/demo publik: anon mendapat akses CRUD langsung ke tiga tabel ini.
--- Gunakan data fiktif. Tidak mengubah izin tabel lain dalam project.
+-- Jalankan setelah schema.sql jika memakai anon key.
+-- Anon bisa melakukan CRUD pada tabel perpustakaan. Gunakan data contoh.
 begin;
 
 grant usage on schema public to anon;

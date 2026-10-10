@@ -1,5 +1,4 @@
--- Jalankan sekali di SQL Editor project Supabase (PostgreSQL 15+).
--- Tidak menghapus tabel maupun data proyek lama.
+-- Jalankan di SQL Editor Supabase untuk membuat tabel perpustakaan.
 begin;
 
 create table if not exists public.members (

@@ -1,5 +1,4 @@
-// Test-only adapter: Supabase JS speaks PostgREST; execute those requests against
-// in-memory PostgreSQL so the real repository, SQL constraints, and view are used.
+// Adapter PostgREST untuk menjalankan query Supabase di database pengujian.
 export function postgrestFetch(db, requests) {
   return async (input, options = {}) => {
     const url = new URL(input);

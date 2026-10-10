@@ -1,4 +1,4 @@
--- Data fiktif opsional untuk demonstrasi. Jalankan setelah schema.sql.
+-- Data contoh. Jalankan setelah schema.sql.
 begin;
 insert into public.members (id, member_code, name, email)
 values ('11111111-1111-4111-8111-111111111111', 'AGT-001', 'Anggota Demo', 'demo@example.test')
